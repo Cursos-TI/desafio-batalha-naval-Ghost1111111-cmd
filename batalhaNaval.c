@@ -87,16 +87,16 @@ int main() {
         tiros++;
 
         if (linha < 0 || linha >= TAMANHO || coluna < 0 || coluna >= TAMANHO) {
-            printf("Coordenada inválida! Tente de novo.\n");
+            printf("Tente novamente.\n");
             continue;
         }
         if (tab[linha][coluna] != -1) {
-            printf("Você já atirou aí! Escolha outro lugar.\n");
+            printf("Você já atirou aí.\n");
             continue;
         }
 
         if (acertou(linha, coluna, nav)) {
-            printf("Você acertou um navio!\n");
+            printf("Você afundou um navio!\n");
             tab[linha][coluna] = 1;
             acertos++;
         } else {
