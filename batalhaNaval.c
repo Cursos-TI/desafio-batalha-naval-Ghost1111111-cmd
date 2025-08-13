@@ -1,40 +1,112 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+#define TAMANHO 5      
+#define NAVIOS 3       
+
+void inicializaTabuleiro(int tab[TAMANHO][TAMANHO]) {
+    for (int i = 0; i < TAMANHO; i++) {
+        for (int j = 0; j < TAMANHO; j++) {
+            tab[i][j] = -1; 
+        }
+    }
+}
+
+void mostraTabuleiro(int tab[TAMANHO][TAMANHO]) {
+    printf("\n   ");
+    for (int c = 0; c < TAMANHO; c++)
+        printf("%d ", c + 1);
+    printf("\n");
+    for (int i = 0; i < TAMANHO; i++) {
+        printf("%d: ", i + 1);
+        for (int j = 0; j < TAMANHO; j++) {
+            if (tab[i][j] == -1) printf("~ "); 
+            else if (tab[i][j] == 0) printf("* ");  
+            else printf("X ");  
+        }
+        printf("\n");
+    }
+}
+
+
+void iniciaNavios(int nav[NAVIOS][2]) {
+    srand(time(NULL));
+    for (int n = 0; n < NAVIOS; n++) {
+        int l, c;
+        int repetido;
+        do {
+            repetido = 0;
+            l = rand() % TAMANHO;
+            c = rand() % TAMANHO;
+            for (int k = 0; k < n; k++) {
+                if (nav[k][0] == l && nav[k][1] == c) {
+                    repetido = 1;
+                    break;
+                }
+            }
+        } while (repetido);
+        nav[n][0] = l;
+        nav[n][1] = c;
+    }
+}
+
+int acertou(int tiroL, int tiroC, int nav[NAVIOS][2]) {
+    for (int n = 0; n < NAVIOS; n++) {
+        if (nav[n][0] == tiroL && nav[n][1] == tiroC)
+            return 1;
+    }
+    return 0;
+}
+
+void dica(int tiroL, int tiroC, int nav[NAVIOS][2]) {
+    int contaL = 0, contaC = 0;
+    for (int n = 0; n < NAVIOS; n++) {
+        if (nav[n][0] == tiroL) contaL++;
+        if (nav[n][1] == tiroC) contaC++;
+    }
+    printf("Dica: navios na mesma linha: %d, na mesma coluna: %d\n", contaL, contaC);
+}
 
 int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+    int tab[TAMANHO][TAMANHO];
+    int nav[NAVIOS][2];
+    int tiros = 0, acertos = 0;
+    int linha, coluna;
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
+    inicializaTabuleiro(tab);
+    iniciaNavios(nav);
 
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
+    printf("Jogo Batalha Naval - você precisa achar %d navios escondidos!\n", NAVIOS);
 
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
+    while (acertos < NAVIOS) {
+        mostraTabuleiro(tab);
+        printf("Digite a linha e coluna (1 a %d): ", TAMANHO);
+        scanf("%d %d", &linha, &coluna);
+        linha--; coluna--;
+        tiros++;
 
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
+        if (linha < 0 || linha >= TAMANHO || coluna < 0 || coluna >= TAMANHO) {
+            printf("Coordenada inválida! Tente de novo.\n");
+            continue;
+        }
+        if (tab[linha][coluna] != -1) {
+            printf("Você já atirou aí! Escolha outro lugar.\n");
+            continue;
+        }
 
+        if (acertou(linha, coluna, nav)) {
+            printf("Você acertou um navio!\n");
+            tab[linha][coluna] = 1;
+            acertos++;
+        } else {
+            printf("Água...\n");
+            tab[linha][coluna] = 0;
+            dica(linha, coluna, nav);
+        }
+    }
+
+    printf("\nParabéns, Você afundou todos os navios em %d tiros.\n", tiros);
+    mostraTabuleiro(tab);
     return 0;
 }
